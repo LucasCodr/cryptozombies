@@ -28,12 +28,23 @@ contract ZombieFactory {
   // Others can read our data but not write to it
   Zombie[] public zombies;
 
+  // Mapping is another is to store organized data in Solidity, it stores using a key-value pair
+  mapping(uint => address) public zombieToOwner; // Who the zombie's belong to
+  mapping(address => uint) ownerZombieCount; // Keeps track of how many zombies the address own
+
   // There are two ways of passing arguments for solidity functions, by reference and value
   // Values: Solidity creates a copy of the variable's value sou we can change it without change the original argument
   // the keyword memory is used to create a value argument
   // Reference: The argument is a reference to the original variable so if we change it the original value gets changed
-  function _createZombie(string memory _name, uint _dna) private {
+  function _createZombie(string memory _name, uint _dna) internal {
+
     uint id = zombies.push(Zombie(_name, _dna)) - 1;
+
+    // msg.sender = who's calling the function (address)
+    zombieToOwner[id] = msg.sender;
+
+    ownerZombieCount[msg.sender]++;
+
     emit NewZombie(id, _name, _dna);
   }
 
@@ -41,12 +52,19 @@ contract ZombieFactory {
   // View functions only view data but not modify it
   // Pure functions don't access any data inside the app
   function _generateRandomDna(string memory _str) private view returns (uint) {
+
     uint rand = uint(keccak256(abi.encodePacked(_str)));
+
     return rand % dnaModulus;
   }
 
   function createRandomZombie(string memory _name) public {
+
+    // the user we'll be able to create only 1 zombie
+    require(ownerZombieCount[msg.sender] == 0);
+
     uint randDna = _generateRandomDna(_name);
+
     _createZombie(_name, randDna);
   }
 }
