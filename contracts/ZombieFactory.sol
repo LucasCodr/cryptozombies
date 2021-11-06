@@ -1,6 +1,8 @@
 pragma solidity >=0.5.0 <0.6.0; // Version Solidity should use to compile this code
 
-contract ZombieFactory {
+import "./Ownable.sol";
+
+contract ZombieFactory is Ownable {
 
   // Events communicate with the frontend to tell if something happened on the blockchain
   // So we can take those events and listen to it
@@ -9,11 +11,17 @@ contract ZombieFactory {
   // State variables are permanently stored in contract storage (Written directly to the blockchain)
   uint dnaDigits = 16;
   uint dnaModulus = 10 ** dnaDigits; // Can be used to short an integer to 16 digits
+  uint cooldownTime = 1 days;
+
 
   // Structs allow the creation of complex data types with multiple properties (js objects (:)
   struct Zombie {
     string name;
     uint dna;
+    uint32 level;
+    uint32 readyTime;
+    uint16 winCount;
+    uint16 lossCount;
   }
 
   // Arrays... do I need to say something else??? YES!! There are two types of arrays in solidity: fixed and dynamic;
@@ -38,7 +46,7 @@ contract ZombieFactory {
   // Reference: The argument is a reference to the original variable so if we change it the original value gets changed
   function _createZombie(string memory _name, uint _dna) internal {
 
-    uint id = zombies.push(Zombie(_name, _dna)) - 1;
+    uint id = zombies.push(Zombie(_name, _dna, 1, uint32(now + cooldownTime), 0, 0)) - 1;
 
     // msg.sender = who's calling the function (address)
     zombieToOwner[id] = msg.sender;
