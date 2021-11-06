@@ -9,7 +9,7 @@ contract ZombieFeeding is ZombieFactory {
   // Storage refers to variables stored permanently on the blockchain.
   // Memory variables are temporary, and are erased between external function calls to your contract.
 
-  modifier ownerOf(uint _zombieId) {
+  modifier onlyOwnerOf(uint _zombieId) {
     require(msg.sender == zombieToOwner[_zombieId]);
     _;
   }
@@ -26,7 +26,7 @@ contract ZombieFeeding is ZombieFactory {
     return (_zombie.readyTime <= now);
   }
 
-  function feedAndMultiply(uint _zombieId, uint _targetDna, string memory _species) internal ownerOf(_zombieId) {
+  function feedAndMultiply(uint _zombieId, uint _targetDna, string memory _species) internal onlyOwnerOf(_zombieId) {
 
     Zombie storage myZombie = zombies[_zombieId];
 

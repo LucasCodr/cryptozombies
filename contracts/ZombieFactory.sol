@@ -1,8 +1,14 @@
 pragma solidity >=0.5.0 <0.6.0; // Version Solidity should use to compile this code
 
 import "./Ownable.sol";
+import "../SafeMath.sol";
+import "../libraries/SafeMath.sol";
 
 contract ZombieFactory is Ownable {
+
+  using SafeMath for uint256;
+  using SafeMath32 for uint32;
+  using SafeMath16 for uint16;
 
   // Events communicate with the frontend to tell if something happened on the blockchain
   // So we can take those events and listen to it
@@ -51,7 +57,7 @@ contract ZombieFactory is Ownable {
     // msg.sender = who's calling the function (address)
     zombieToOwner[id] = msg.sender;
 
-    ownerZombieCount[msg.sender]++;
+    ownerZombieCount[msg.sender] = ownerZombieCount[msg.sender].add(1);
 
     emit NewZombie(id, _name, _dna);
   }
